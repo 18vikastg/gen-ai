@@ -1,0 +1,43 @@
+
+
+import spacy
+
+
+nlp = spacy.load("en_core_web_sm")
+
+
+IPC_SECTIONS = {
+    "302": "Section 302 IPC: Punishment for murder. Death or life imprisonment, and fine.",
+    "375": "Section 375 IPC: Rape. Defines what constitutes rape.",
+    "420": "Section 420 IPC: Cheating and dishonestly inducing delivery of property.",
+    "376": "Section 376 IPC: Punishment for rape. Minimum 10 years imprisonment, up to life, and fine.",
+    "124A": "Section 124A IPC: Sedition. Punishment for inciting hatred against the Government."
+}
+
+
+def extract_ipc_section(text):
+    doc = nlp(text.lower())
+    for i, token in enumerate(doc):
+        if token.text in IPC_SECTIONS:
+            return token.text
+        if token.text == "section" and i + 1 < len(doc) and doc[i + 1].text in IPC_SECTIONS:
+            return doc[i + 1].text
+    return None
+
+
+def chat():
+    print("IPC Chatbot: Ask about any IPC section (e.g., 'Section 302') or type 'exit' to quit.")
+    while True:
+        user_input = input("You: ").lower()
+        if user_input in ['exit', 'quit', 'bye']:
+            print("IPC Chatbot: Goodbye!")
+            break
+        section = extract_ipc_section(user_input)
+        if section:
+            print(f"IPC Chatbot: {IPC_SECTIONS[section]}")
+        elif "hello" in user_input or "hi" in user_input:
+            print("IPC Chatbot: Hi! Ask about an IPC section.")
+        else:
+            print("IPC Chatbot: Please specify an IPC section like 'Section 420'.")
+
+chat()

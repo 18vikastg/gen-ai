@@ -1,0 +1,25 @@
+import gensim.downloader as api
+model=api.load("word2vec-google-news-300")
+import openai
+
+def get_similar(seed_word,top_n=5):
+    try:
+        return[w for w,score in model.most_similar(seed_word,topn=top_n)]
+    except KeyError:
+        return []
+def generate_para(user_inp, similar_words):
+    word_str1=','.join(similar_words)
+    prompt=(f"create simple and creative ten sentence using{user_inp},"
+              f"and use related words as start points{word_str1}"
+              f"sentences should be concise and clear  "
+            )
+    print(prompt)
+    openai.api_key=""
+    response=openai.chat.completions.create(model='gpt-4o-mini',messages=[{"role":"system","content":"you are creative writer"},
+                                                                           {"role":"user","content": prompt}],max_tokens=150)
+    return response.choices[0].message.content 
+
+inp=input("enter seed ")
+sim=get_similar(inp)
+res=generate_para(inp,sim)
+print(res)
